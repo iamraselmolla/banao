@@ -13,15 +13,17 @@ const Header = () => {
                 <form>
 
                     <div>
-                        <input type="password" className="form-control rounded-5" id="exampleInputPassword1" />
+                        <input placeholder='Search for your favorite groups in ATG' type="password" className="form-control rounded-5" id="exampleInputPassword1" />
                     </div>
 
 
                 </form>
-                <div>
-                    Create account. It’s free!
+                <div className='fw-bold'>
+                    Create account. <a className='text-decoration-none' href=''>It’s free!</a>
                 </div>
             </div>
+
+            
 
         </header>
     );
