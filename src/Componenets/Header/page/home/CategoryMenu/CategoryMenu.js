@@ -6,6 +6,7 @@ import { MdLocationOn } from 'react-icons/md'
 import { useEffect } from 'react';
 import { useState } from 'react';
 import Post from '../../../../shared/Post';
+import { AiFillEdit } from 'react-icons/ai';
 
 const CategoryMenu = () => {
     const [posts, setPosts] = useState([])
@@ -37,7 +38,7 @@ const CategoryMenu = () => {
                         Posts ({posts?.length})
                     </p>
                     <select style={{ background: ' #F1F3F5' }} className='me-3 fw-bolder border-0 px-2 py-2 fw-bold' name="" id="">
-                        <option value="">All</option>
+                        <option value="">Filter: All</option>
                         <option value="">Article</option>
                         <option value="">Education</option>
                         <option value="">MeetUp</option>
@@ -47,6 +48,9 @@ const CategoryMenu = () => {
                 <div className="row">
                     <div className="col-md-7">
                         {posts?.map(singlePost => <Post post={singlePost}></Post>)}
+                        <div className="post-btn d-block d-sm-block d-md-none">
+                            <AiFillEdit></AiFillEdit>
+                        </div>
                     </div>
                     <div className="col-md-4 d-none d-sm-none d-md-block pt-5 offset-md-1">
                         <div className="d-flex border-bottom">
