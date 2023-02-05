@@ -75,14 +75,7 @@ section {
 }
 
 /* Modal Content/Box */
-.modal-content-register {
-  background-color: #fefefe;
-  margin: 3% auto;
-  /* 15% from the top and centered */
-  border-radius: 5px;
-  width: 60%;
-  /* Could be more or less, depending on screen size */
-}
+
 
 /* The Close Button */
 .close {
