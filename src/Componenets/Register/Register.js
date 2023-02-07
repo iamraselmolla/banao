@@ -24,7 +24,7 @@ const Register = () => {
                        const email = e.target.email.value;
                        const  userCreated = new Date().getTime();
                        const alluserInfo = {userName, email, userCreated}
-                        fetch('http://localhost:5000/users', {
+                        fetch('https://atg-globe-server.vercel.app/users', {
                             method: 'POST',
                             headers: {
                                 'content-type': 'application/json'

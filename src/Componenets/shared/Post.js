@@ -9,15 +9,12 @@ import Comment from './Comment';
 const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
     const { user } = useContext(AuthContext)
     const [commentRealod, setCommentRealod] = useState(false);
-    let [likedOrNot, setlikedOrNot] = useState(false)
-    const [show, setShow] = useState(false);
     const [comments, setComments] = useState([]);
-    const [limit, setLimit] = useState(2)
     const { _id, postData, postedTime, userName } = post;
     const timePosted = new Date(postedTime).toLocaleString("en-GB")
     const handleDelete = (id) => {
         if (window.confirm()) {
-            fetch(`http://localhost:5000/delete-post/${_id}`, {
+            fetch(`https://atg-globe-server.vercel.app/delete-post/${_id}`, {
                 method: 'DELETE'
             })
                 .then(res => res.json())
@@ -47,7 +44,7 @@ const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
         const commentTime = new Date().getTime()
         const commentData = { email, postId, comment, commentTime, name }
         console.log(commentData)
-        fetch('http://localhost:5000/comment', {
+        fetch('https://atg-globe-server.vercel.app/comment', {
             method: 'POST',
             headers: {
                 'content-type': 'application/json'
@@ -64,20 +61,20 @@ const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
 
     }
     useEffect(() => {
-        fetch(`http://localhost:5000/comments?id=${_id}`)
+        fetch(`https://atg-globe-server.vercel.app/comments?id=${_id}`)
             .then(res => res.json())
             .then(data => {
                 return setComments(data)
             })
             .catch(err => console.log(err.message))
     }, [commentRealod])
-   
+
     const hanldeLike = () => {
         const userEmail = user?.email;
         const likedMail = { userEmail }
 
 
-        fetch(`http://localhost:5000/like?id=${_id}`, {
+        fetch(`https://atg-globe-server.vercel.app/like?id=${_id}`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json'
@@ -88,10 +85,10 @@ const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
             .then(data => {
                 if (data?.exist) {
                     setReload(!reload)
-                   
+
                 } else {
                     setReload(!reload)
-                   
+
 
                 }
             })
@@ -127,14 +124,19 @@ const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
 
                 <div className="d-flex fs-4 gap-3 mt-2">
                     <div>
-                        {!post?.like.includes(user?.email) ? <AiOutlineLike style={{ cursor: 'pointer' }} className='text-success' onClick={hanldeLike}></AiOutlineLike>: ''}
-                        {post?.like.includes(user?.email) ? <AiFillLike style={{ cursor: 'pointer' }} className='text-success'></AiFillLike>: ''}
+                        {user && <p className='mb-0 fw-light fs-6'>
+                            {(post?.like.length)} liked this
+                        </p>}
+                        {!post?.like.includes(user?.email) ? <>
+                            <AiOutlineLike style={{ cursor: 'pointer' }} className='text-success' onClick={hanldeLike}></AiOutlineLike>
+                        </> : ''}
+                        {post?.like.includes(user?.email) ? <AiFillLike style={{ cursor: 'pointer' }} className='text-success'></AiFillLike> : ''}
 
                     </div>
 
                 </div>
                 <p className="fs-4">
-                    <span onClick={() => setLimit(0)} className="text-success fw-bold">
+                    <span className="text-success fw-bold">
                         All comments ({comments?.length})
                     </span>
                 </p>

@@ -16,7 +16,7 @@ const Login = () => {
             return toast.error('Please input your username')
         }
 
-        fetch(`http://localhost:5000/get-user?name=${e.target.username.value}`)
+        fetch(`https://atg-globe-server.vercel.app/get-user?name=${e.target.username.value}`)
             .then(res => res.json())
             .then(data => {
                 console.log(data)

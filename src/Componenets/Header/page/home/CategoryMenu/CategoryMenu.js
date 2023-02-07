@@ -14,12 +14,12 @@ const CategoryMenu = () => {
     const [posts, setPosts] = useState([]);
     const [reload, setReload] = useState(false);
     const [show, setShow] = useState(false);
-    const [editPost, setEditPost] = useState(null)
+    const [editPost, setEditPost] = useState(null);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     useEffect(() => {
-        fetch('http://localhost:5000/posts')
+        fetch('https://atg-globe-server.vercel.app/posts')
             .then(res => res.json())
             .then(data => {
                 setPosts(data);
@@ -42,8 +42,8 @@ const CategoryMenu = () => {
         const userName = user?.displayName;
         const userMail = user?.email;
         const like = [];
-        const allDataInfo = { postData, postedTime, userName, userMail,like };
-        fetch('http://localhost:5000/posts', {
+        const allDataInfo = { postData, postedTime, userName, userMail, like };
+        fetch('https://atg-globe-server.vercel.app/posts', {
             method: 'POST',
             headers: {
                 'content-type': 'application/json'
@@ -63,7 +63,7 @@ const CategoryMenu = () => {
         e.preventDefault()
         handleClose();
         const editedPost = e.target.editpostText.value;
-        fetch(`http://localhost:5000/edit-post/${editPost?._id}`, {
+        fetch(`https://atg-globe-server.vercel.app/edit-post/${editPost?._id}`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json'
@@ -89,25 +89,27 @@ const CategoryMenu = () => {
                         </h2>
                         {posts?.map(singlePost => <Post setReload={setReload} reload={reload} setEditPost={setEditPost} handleShow={handleShow} key={singlePost?._id} post={singlePost}></Post>)}
                         <a href="#post">
-                        <div className="post-btn d-block d-sm-block d-md-none">
-                            <AiFillEdit></AiFillEdit>
-                        </div>
+                            <div className="post-btn d-block d-sm-block d-md-none">
+                                <AiFillEdit></AiFillEdit>
+                            </div>
                         </a>
                     </div>
-                    <div id='post' className="col-md-4 offset-md-1">
-                        <h2 className="fw-bolder mb-4">
-                            Write a Post <AiFillEdit></AiFillEdit>
-                        </h2>
-                        <form onSubmit={handlePost}>
-                            <div className="mb-3">
-                                <textarea name='postText' className="form-control" placeholder="Write your thought..." id="floatingTextarea"></textarea>
-                            </div>
-                            {/* <div className="mb-3">
+                    <div id='post' className="col-md-4 offset-md-1 position-relative">
+                        <div className="position-sticky mt-3 top-0">
+                            <h2 className="fw-bolder mb-4">
+                                Write a Post <AiFillEdit></AiFillEdit>
+                            </h2>
+                            <form onSubmit={handlePost}>
+                                <div className="mb-3">
+                                    <textarea name='postText' className="form-control" placeholder="Write your thought..." id="floatingTextarea"></textarea>
+                                </div>
+                                {/* <div className="mb-3">
                                 <input name='postFile' className="form-control" type="file" id="formFile" />
                             </div> */}
-                            <button type="submit" className="btn mt-1 py-2 w-100 rounded-5 fw-bold btn-success">Post</button>
-                        </form>
+                                <button type="submit" className="btn mt-1 py-2 w-100 rounded-5 fw-bold btn-success">Post</button>
+                            </form>
 
+                        </div>
                     </div>
                 </div>
             </div>
