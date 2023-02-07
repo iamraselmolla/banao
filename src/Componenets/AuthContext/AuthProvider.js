@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from 'firebase/auth'
 import app from '../firebase/firebase-init';
 
 const auth = getAuth(app)
@@ -10,20 +10,24 @@ const AuthProvider = ({ children }) => {
 
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [allPosts, setAllPosts] = useState(0)
     const createUser = (email, password) => {
         setLoading(true);
         return createUserWithEmailAndPassword(auth, email, password);
     }
-    // Social login (Google)
-    const loginWithGoogle = (provider) => {
-        setLoading(true)
-        return signInWithPopup(auth, provider)
-    }
+ 
     // User login
     const login = (email, password) => {
         setLoading(true);
         return signInWithEmailAndPassword(auth, email, password);
     }
+    // Password Reset
+    const handleResetPass = (email) => {
+
+        return sendPasswordResetEmail(auth,email)
+    }
+    // Update user info
+    
     // User Logout
     const logOut = () => {
         setLoading(true)
@@ -44,7 +48,7 @@ const AuthProvider = ({ children }) => {
             return unsubscribe();
         }
     }, []);
-    const authInfo = { createUser, loginWithGoogle, login, logOut, updateUserInfo, loading, user }
+    const authInfo = { createUser, login, logOut,handleResetPass,allPosts, setAllPosts, updateUserInfo, loading, user }
 
     return (
         <AuthContext.Provider value={authInfo}>

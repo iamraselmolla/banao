@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { AiOutlineSearch } from 'react-icons/ai';
-import { FaFacebook } from 'react-icons/fa'
+import { FaFacebook, FaHandshake } from 'react-icons/fa'
 import { FcGoogle } from 'react-icons/fc'
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../AuthContext/AuthProvider';
@@ -26,12 +26,15 @@ const Header = () => {
                 <form>
 
                     <div className='d-flex align-items-center rounded-5 px-3 border'>
-                        <AiOutlineSearch className='fs-4'></AiOutlineSearch> <input placeholder='Search for your favorite groups in ATG' type="password" className="form-control search-input border-0 rounded-5" id="exampleInputPassword1" />
+                        <AiOutlineSearch className='fs-4'></AiOutlineSearch> <input placeholder='Search for your favorite groups in ATG' type="text" className="form-control search-input border-0 rounded-5" id="exampleInputPassword1" />
                     </div>
 
 
                 </form>
                 <div>
+                    <span className="fw-bolde">
+                        {user && <span className="fw-bolder"> <FaHandshake className="fs-3 me-2"></FaHandshake> Hi {user?.displayName} </span>}
+                    </span>
                     {!user && <><Link to="/login" className='text-decoration-none text-success fw-bolder px-3'>Login</Link>
                     <Link to="/register" className='text-decoration-none text-success fw-bolder px-3'>Register</Link></>}
                     {user && <span onClick={handleLogout} style={{cursor: 'pointer'}} className='text-decoration-none text-success fw-bolder px-3'>Logout</span>}

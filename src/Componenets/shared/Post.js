@@ -1,111 +1,132 @@
-import React from 'react';
-import { GrView } from 'react-icons/gr'
-import { BiShareAlt, BiShoppingBag } from 'react-icons/bi'
-import { AiOutlineCalendar, AiTwotoneCalendar } from 'react-icons/ai'
-import { MdLocationPin } from 'react-icons/md'
-import { BsPenFill } from 'react-icons/bs'
-import { GiMicroscope, GiShoppingBag } from 'react-icons/gi'
-import { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 
-const Post = ({ post }) => {
-    const [show, setShow] = useState(false)
-    console.log(post)
-    const { img, title, description, meeting_location, meeting_date, website, category, category_id, user, user_img, view, compnay_name, company_location, timesjob } = post
+import { AiFillLike, AiOutlineComment, AiOutlineEdit, AiOutlineLike } from 'react-icons/ai';
+import { MdOutlineDelete } from 'react-icons/md';
+import { AuthContext } from '../AuthContext/AuthProvider';
+import Comment from './Comment';
+
+const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
+    const { user } = useContext(AuthContext)
+    const [commentRealod, setCommentRealod] = useState(false)
+    const [show, setShow] = useState(false);
+    const [comments, setComments] = useState([]);
+    const [limit, setLimit] = useState(2)
+    const { _id, postData, postedTime, userName } = post;
+    const timePosted = new Date(postedTime).toLocaleString("en-GB")
+    const handleDelete = (id) => {
+        if (window.confirm()) {
+            fetch(`https://atg-globe-server.vercel.app/delete-post/${_id}`, {
+                method: 'DELETE'
+            })
+                .then(res => res.json())
+                .then(data => {
+                    setReload(!reload)
+                    toast.success("Post deleted successfully")
+                })
+                .catch(err => console.log(err.message))
+        }
+    }
+    const handleUpdatePost = () => {
+        setEditPost(post)
+        handleShow()
+    }
+    const handleComment = (e) => {
+        e.preventDefault()
+        if(!user){
+            return toast.error("please login first to comment")
+        }
+        if(!e.target.comment.value){
+            return toast.error("Please write something")
+        }
+        const email = user?.email;
+        const name = user?.displayName
+        const postId = post?._id;
+        const comment = e.target.comment.value;
+        const commentTime = new Date().getTime()
+        const commentData = { email, postId, comment, commentTime, name }
+        console.log(commentData)
+        fetch('https://atg-globe-server.vercel.app/comment', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(commentData)
+        })
+            .then(res => res.json())
+            .then(data => {
+                e.target.reset()
+                setCommentRealod(!commentRealod)
+                toast.success("Comment shared successfully")
+            })
+            .catch(err => console.log(err.message))
+
+    }
+    useEffect(() => {
+        fetch(`https://atg-globe-server.vercel.app/comments?id=${_id}`)
+            .then(res => res.json())
+            .then(data => {
+                return setComments(data)
+            })
+            .catch(err => console.log(err.message))
+    }, [commentRealod])
+    console.log(comments)
+
     return (
-        <div className='single-post border border-1 my-2 rounded'>
-            {img && <img className='img-fluid' src={img} />}
-            <div className="px-3 py-3">
-                <span className="fw-bolder mb-3 d-block">
-                    <span className='me-2'>
-                        {category === "Article" && <BsPenFill></BsPenFill>}
-                        {category === "Education" && <GiMicroscope></GiMicroscope>}
-                        {category === "Meetup" && <AiTwotoneCalendar></AiTwotoneCalendar>}
-                        {category === "Job" && <GiShoppingBag></GiShoppingBag>}
-                    </span>
+        <div className='single-post border px-3 py-4 border-1 my-2 rounded'>
+            <div cl className="fw-bolder position-relative">
+                <span className="position-absolute" style={{ right: '-10px', top: '-20px' }}>
 
-                    {category}
+                    {user && user?.email === post?.userMail && <div className="d-flex">
+                        <div><AiOutlineEdit onClick={handleUpdatePost} style={{ cursor: 'pointer' }} className="fs-4 text-success userhandleicon"></AiOutlineEdit></div>
+                        <div>
+                            <MdOutlineDelete style={{ cursor: 'pointer' }} onClick={() => handleDelete(_id)} className="fs-4 ms-2 text-danger userhandleicon"></MdOutlineDelete>
+                        </div>
+
+                    </div>}
+
                 </span>
-                <div className="section_title d-flex justify-content-between">
-                    <h4 className="fw-bolder">
-                        {title}
-                    </h4>
-                    <span onClick={() => setShow(!show)} className="fw-bolder position-relative">
-                        ...
-                        {show && <>
-                            <div style={{ top: '30px', left: '-54px', background: '#fff' }} className='position-absolute shadow-lg px-3 py-2 rounded'>
-                                <div>
-                                    Edit
-                                </div>
-                                <div>
-                                    Report
-                                </div>
-                            </div>
-                        </>}
-                    </span>
-                </div>
-                {description && <p className="text-muted">
-                    {description}
-                </p>}
-                {category === "Meetup" && <>
-                    <div className="d-flex fw-bold my-2">
-                        <div>
-                            <AiOutlineCalendar></AiOutlineCalendar> {meeting_date}
-                        </div>
-                        <div className='ms-5'>
-                            <MdLocationPin></MdLocationPin> {meeting_location}
-                        </div>
+                <p className="fw-bolder">
+                    {postData}
+                </p>
 
+                <div className="d-flex text-muted">
+                    <div>
+                        Posted By: {userName}
                     </div>
-                    <a href={website} target="_blank">
-                        <button className="btn mt-2 text-danger fw-bold w-100 bg-transparent border border-1 rounded">
-                            Visit Website
-                        </button>
-                    </a>
-                </>}
-                {category === "Job" && <>
-                    <div className="d-flex fw-bold my-2">
-                        <div>
-                            <BiShoppingBag></BiShoppingBag> {compnay_name}
-                        </div>
-                        <div className='ms-5'>
-                            <MdLocationPin></MdLocationPin> {company_location}
-                        </div>
-
-                    </div>
-                    <a href={timesjob} target="_blank">
-                        <button className="btn mt-2 text-success fw-bold w-100 bg-transparent border border-1 rounded">
-                            Apply on timejobs
-                        </button>
-                    </a>
-                </>}
-                <div className="d-none d-sm-none d-md-block">
-                    <div className="d-flex mt-3 justify-content-between">
-                        <div className="user d-flex align-items-center gap-3">
-                            <img src={user_img} alt="" />
-                            <p className="m-0 fw-bold">
-                                {user}
-                            </p>
-                        </div>
-                        <div className="share-view d-flex">
-                            <div className='fw-bold text-muted'>
-                                <GrView className='me-1'></GrView>{view}
-                                <BiShareAlt className='text-muted ms-4'></BiShareAlt>
-                            </div>
-                        </div>
+                    <div className="ms-3">
+                        Posted On: {timePosted}
                     </div>
                 </div>
-                <div className="d-flex mt-3 align-items-center justify-content-between d-sm-flex d-md-none">
-                    <div className="user d-flex align-items-center gap-3">
-                        <img src={user_img} alt="" />
-                        <p className="m-0 fw-bold d-flex flex-column">
-                            {user}
-                            <div>{view} Views</div>
+
+                <div className="d-flex fs-4 gap-3 mt-2">
+                    <div>
+                        {show ? <AiFillLike style={{ cursor: 'pointer' }} className='text-success' onClick={() => setShow(!show)}></AiFillLike> :
+                            <AiOutlineLike style={{ cursor: 'pointer' }} className='text-success' onClick={() => setShow(!show)}></AiOutlineLike>}
+
+                    </div>
+
+                </div>
+                <p className="fs-4">
+                            <span onClick={()=> setLimit(0)} className="text-success fw-bold">
+                          All comments ({comments?.length})
+                            </span>
                         </p>
+                {comments && <>
+                    <div className="ms-4 mt-3 fw-light">
+                       
+                        {comments?.map(sinleComment => <Comment sinleComment={sinleComment}></Comment>)}
                     </div>
-                    <div style={{background: '#F1F3F5'}} className='px-3 py-2 rounded'>
-                         <BiShareAlt className='text-muted me-2'></BiShareAlt>Share 
-                    </div>
+                </>}
+                <><div className='mt-3'>
+                    Write a Comment
                 </div>
+                    <form onSubmit={handleComment}>
+                        <div className="mt-2">
+                            <textarea name='comment' className="form-control" placeholder="Write your comment..." id="floatingTextarea"></textarea>
+                            <button type="submit" className="btn mt-3 py-2 px-4 rounded-5 fw-bold btn-success">Comment</button>
+                        </div>
+                    </form></>
 
             </div>
         </div>

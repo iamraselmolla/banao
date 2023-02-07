@@ -1,7 +1,37 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext,useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../AuthContext/AuthProvider';
 
 const Login = () => {
+    const { login } = useContext(AuthContext);
+    const [showLoading, setShowLoading] = useState(false)
+    const navigate = useNavigate()
+
+    const handleLogin = (e) => {
+        e.preventDefault()
+        setShowLoading(true)
+        if(!e.target.username.value){
+            return toast.error('Please input your username')
+        }
+
+        fetch(`https://atg-globe-server.vercel.app/get-user?name=${e.target.username.value}`)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                login(data?.email, e.target.password.value)
+                    .then(res => {
+                        setShowLoading(false)
+                        toast.success('You are logged in successfully')
+                        navigate('/')
+                    })
+                    .catch(err => console.log(err.message))
+            })
+            .catch(err => {
+                console.log(err)
+                setShowLoading(false)
+            })
+    }
     return (
         <div className="container py-5">
             <div className="register-user pb-2 px-4 pt-4">
@@ -12,7 +42,7 @@ const Login = () => {
                                 Welcome Back !
                             </h3>
                             <div className="register-user-form">
-                                <form>
+                                <form onSubmit={handleLogin}>
                                     <div className="row">
                                         <input name='username' placeholder='Username' type="text" className="form-control rounded-0 fw-bold py-3  border-bottom-none text-muted" id="emailinput" />
                                     </div>
@@ -20,23 +50,28 @@ const Login = () => {
                                         <input name='password' placeholder='Password' type="password" className="form-control rounded-0 fw-bold py-3  text-muted" id="passinputlogin" />
                                     </div>
                                     <div className="row">
-                                        <button type="submit" className="btn mt-3 py-3 w-100 rounded-5 fw-bold btn-success">Log in</button>
+                                        {!showLoading && <button type="submit" className="btn mt-3 py-2 w-100 rounded-5 fw-bold btn-success">Log in</button>}
+
+                                        {showLoading && <button class="btn mt-3 py-2 w-100 rounded-5 fw-bold btn-success" type="button" disabled>
+                                            <span class="spinner-border me-2 spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Please Wait...
+                                        </button>}
                                     </div>
                                 </form>
 
                                 <p className="fw-bolder">
                                     Forget Password? <Link className='text-decoration-none text-success' to="/forget-password">reset!</Link>
                                 </p>
-                               
+
                             </div>
                         </div>
                     </div>
                     <div className="col-md-6 text-center">
                         <p className="mb-0">
-                           Not have an Account? <Link to="/register"  className='text-success text-decoration-none fw-bold'>Please Register First</Link>
+                            Not have an Account? <Link to="/register" className='text-success text-decoration-none fw-bold'>Please Register First</Link>
                         </p>
                         <img src="register.png" className='img-fluid' alt="Register user" />
-                        
+
                     </div>
                 </div>
             </div>
