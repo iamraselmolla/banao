@@ -6,7 +6,8 @@ import { AuthContext } from '../AuthContext/AuthProvider';
 const Login = () => {
     const { login } = useContext(AuthContext);
     const [showLoading, setShowLoading] = useState(false)
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    
 
     const handleLogin = (e) => {
         e.preventDefault()
@@ -15,7 +16,7 @@ const Login = () => {
             return toast.error('Please input your username')
         }
 
-        fetch(`https://atg-globe-server.vercel.app/get-user?name=${e.target.username.value}`)
+        fetch(`http://localhost:5000/get-user?name=${e.target.username.value}`)
             .then(res => res.json())
             .then(data => {
                 console.log(data)

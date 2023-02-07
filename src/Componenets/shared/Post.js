@@ -8,7 +8,8 @@ import Comment from './Comment';
 
 const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
     const { user } = useContext(AuthContext)
-    const [commentRealod, setCommentRealod] = useState(false)
+    const [commentRealod, setCommentRealod] = useState(false);
+    let [likedOrNot, setlikedOrNot] = useState(false)
     const [show, setShow] = useState(false);
     const [comments, setComments] = useState([]);
     const [limit, setLimit] = useState(2)
@@ -16,7 +17,7 @@ const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
     const timePosted = new Date(postedTime).toLocaleString("en-GB")
     const handleDelete = (id) => {
         if (window.confirm()) {
-            fetch(`https://atg-globe-server.vercel.app/delete-post/${_id}`, {
+            fetch(`http://localhost:5000/delete-post/${_id}`, {
                 method: 'DELETE'
             })
                 .then(res => res.json())
@@ -33,10 +34,10 @@ const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
     }
     const handleComment = (e) => {
         e.preventDefault()
-        if(!user){
+        if (!user) {
             return toast.error("please login first to comment")
         }
-        if(!e.target.comment.value){
+        if (!e.target.comment.value) {
             return toast.error("Please write something")
         }
         const email = user?.email;
@@ -46,7 +47,7 @@ const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
         const commentTime = new Date().getTime()
         const commentData = { email, postId, comment, commentTime, name }
         console.log(commentData)
-        fetch('https://atg-globe-server.vercel.app/comment', {
+        fetch('http://localhost:5000/comment', {
             method: 'POST',
             headers: {
                 'content-type': 'application/json'
@@ -63,14 +64,39 @@ const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
 
     }
     useEffect(() => {
-        fetch(`https://atg-globe-server.vercel.app/comments?id=${_id}`)
+        fetch(`http://localhost:5000/comments?id=${_id}`)
             .then(res => res.json())
             .then(data => {
                 return setComments(data)
             })
             .catch(err => console.log(err.message))
     }, [commentRealod])
-    console.log(comments)
+   
+    const hanldeLike = () => {
+        const userEmail = user?.email;
+        const likedMail = { userEmail }
+
+
+        fetch(`http://localhost:5000/like?id=${_id}`, {
+            method: 'PUT',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(likedMail)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data?.exist) {
+                    setReload(!reload)
+                   
+                } else {
+                    setReload(!reload)
+                   
+
+                }
+            })
+            .catch(err => console.log(err.message))
+    }
 
     return (
         <div className='single-post border px-3 py-4 border-1 my-2 rounded'>
@@ -101,21 +127,21 @@ const Post = ({ post, handleShow, setEditPost, setReload, reload }) => {
 
                 <div className="d-flex fs-4 gap-3 mt-2">
                     <div>
-                        {show ? <AiFillLike style={{ cursor: 'pointer' }} className='text-success' onClick={() => setShow(!show)}></AiFillLike> :
-                            <AiOutlineLike style={{ cursor: 'pointer' }} className='text-success' onClick={() => setShow(!show)}></AiOutlineLike>}
+                        {!post?.like.includes(user?.email) ? <AiOutlineLike style={{ cursor: 'pointer' }} className='text-success' onClick={hanldeLike}></AiOutlineLike>: ''}
+                        {post?.like.includes(user?.email) ? <AiFillLike style={{ cursor: 'pointer' }} className='text-success'></AiFillLike>: ''}
 
                     </div>
 
                 </div>
                 <p className="fs-4">
-                            <span onClick={()=> setLimit(0)} className="text-success fw-bold">
-                          All comments ({comments?.length})
-                            </span>
-                        </p>
+                    <span onClick={() => setLimit(0)} className="text-success fw-bold">
+                        All comments ({comments?.length})
+                    </span>
+                </p>
                 {comments && <>
                     <div className="ms-4 mt-3 fw-light">
-                       
-                        {comments?.map(sinleComment => <Comment sinleComment={sinleComment}></Comment>)}
+
+                        {comments?.map(sinleComment => <Comment key={sinleComment?._id} sinleComment={sinleComment}></Comment>)}
                     </div>
                 </>}
                 <><div className='mt-3'>

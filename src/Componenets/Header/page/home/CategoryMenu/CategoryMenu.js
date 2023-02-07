@@ -19,7 +19,7 @@ const CategoryMenu = () => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     useEffect(() => {
-        fetch('https://atg-globe-server.vercel.app/posts')
+        fetch('http://localhost:5000/posts')
             .then(res => res.json())
             .then(data => {
                 setPosts(data);
@@ -40,10 +40,10 @@ const CategoryMenu = () => {
         const postData = e.target.postText.value;
         const postedTime = new Date().getTime();
         const userName = user?.displayName;
-        const userMail = user?.email
-        const allDataInfo = { postData, postedTime, userName, userMail };
-        console.log(allDataInfo)
-        fetch('https://atg-globe-server.vercel.app/posts', {
+        const userMail = user?.email;
+        const like = [];
+        const allDataInfo = { postData, postedTime, userName, userMail,like };
+        fetch('http://localhost:5000/posts', {
             method: 'POST',
             headers: {
                 'content-type': 'application/json'
@@ -63,7 +63,7 @@ const CategoryMenu = () => {
         e.preventDefault()
         handleClose();
         const editedPost = e.target.editpostText.value;
-        fetch(`https://atg-globe-server.vercel.app/edit-post/${editPost?._id}`, {
+        fetch(`http://localhost:5000/edit-post/${editPost?._id}`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json'
